@@ -2268,7 +2268,7 @@ document.dispatchEvent(new Event('fbReady'));
     <div class="bal-card">
       <div class="bal-card-shimmer"></div>
       <div class="bal-deco">🍂</div>
-      <div class="bal-lbl">✨ Total Balance</div>
+      <div class="bal-lbl">✨ Total Balance (All-time)</div>
       <div class="bal-amt"><sup>₱</sup><span id="tBal">0.00</span></div>
       <div class="bal-mo" id="balMo">April 2026</div>
       <div class="bal-pills">
@@ -3400,13 +3400,16 @@ function renderTxns(){
 function updateSum(){
   const now = new Date();
   const m = now.getMonth(), y = now.getFullYear();
-  // Phase 3: use helper — replaces repeated filter+reduce pattern
-  const mt = getMonthTxns(ga().txns, m, y);
+  // All-time balance: uses every transaction, not just current month
+  const allTxns = ga().txns;
+  const { inc: totalInc, exp: totalExp } = calcTotals(allTxns);
+  document.getElementById('tBal').textContent = (totalInc - totalExp).toFixed(2);
+  // Income/Expense pills still show current month
+  const mt = getMonthTxns(allTxns, m, y);
   const { inc, exp } = calcTotals(mt);
-  document.getElementById('tBal').textContent = (inc - exp).toFixed(2);
   document.getElementById('tInc').textContent = inc.toFixed(2);
   document.getElementById('tExp').textContent = exp.toFixed(2);
-  document.getElementById('balMo').textContent = now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  document.getElementById('balMo').textContent = 'All-time Balance';
   updateInsights();
   updateEfHomeCard();
   updateVelocity(mt, exp, now);
